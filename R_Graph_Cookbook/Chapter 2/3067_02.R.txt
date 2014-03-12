@@ -1,0 +1,191 @@
+#Recipe 1. Setting colors of points, lines and bars
+
+plot(rnorm(1000),
+col="red")
+
+sales <- read.csv("dailysales.csv",header=TRUE)
+
+plot(Sales$units~as.Date(Sales$date,"%d/%m/%y"),
+type="l", #Specify type of plot as l for line
+col="blue")
+
+barplot(Sales$ProductA~Sales$City,
+col="blue")
+
+
+#Vector of colors
+
+heat.colors(5)
+
+barplot(as.matrix(sales[,2:4]), beside=T,
+legend=sales$City,
+col=c("red","blue","green","orange","pink"),
+border="white")
+
+barplot(as.matrix(sales[,2:4]), beside=T,
+legend=sales$City,
+col=c("red","blue","green","orange"),
+border="white")
+
+barplot(as.matrix(sales[,2:4]), beside=T,
+legend=sales$City,
+col=heat.colors(length(sales$City)),
+border="white")
+
+
+
+
+#Recipe 2. Setting plot background colors
+
+par(bg="gray")
+plot(rnorm(100))
+
+
+plot(rnorm(1000),type="n")
+x<-par("usr")
+rect(x[1],x[3],x[2],x[4],col="lightgray ")
+points(rnorm(1000))
+
+
+
+#Recipe 3. Setting colors for text elements: axis labels, titles, plot titles and legends
+
+plot(rnorm(100), 
+main="Plot Title",
+col.axis="blue",
+col.lab="red",
+col.main="darkblue")
+
+
+par(col.axis="black",
+col.lab="#444444",
+col.main="darkblue")
+
+plot(rnorm(100),main="plot")
+
+
+title("Sales Figures for 2010", col.main="blue")
+
+title(xlab="Month",ylab="Sales",col.lab="red")
+
+
+title(xlab="X axis",col.lab="red")
+title(ylab="Y axis",col.lab="blue")
+
+
+
+#Recipe 4. Choosing color combinations and palettes
+
+palette(c("red","blue","green","orange"))
+
+palette("default")
+
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+display.brewer.all()
+
+brewer.pal(7,"YlOrRd")
+
+display.brewer.pal(7,"YlOrRd")
+
+palette(brewer.pal(7,"YlOrRd"))
+
+pal1<- brewer.pal(7,"YlOrRd")
+
+
+
+#Recipe 5. Setting fonts for annotations and titles 
+
+par(family="serif",font=2)
+
+names(pdfFonts())
+
+
+
+
+#Recipe 6. Choosing plotting point symbol styles and sizes
+
+rain<-read.csv("cityrain.csv")
+
+plot(rnorm(100),pch=19,cex=2)
+
+plot(rain$Tokyo,
+ylim=c(0,250),
+main="Monthly Rainfall in major cities",
+xlab="Month of Year",
+ylab="Rainfall (mm)",
+pch=1)
+
+points(rain$NewYork,pch=2)
+points(rain$London,pch=3)
+points(rain$Berlin,pch=4)
+
+legend("top",
+legend=c("Tokyo","New York","London","Berlin"),
+ncol=4,
+cex=0.8,
+bty="n",
+pch=1:4)
+
+
+
+
+
+
+#Recipe 7. Choosing line styles and width
+
+plot(rain$Tokyo,
+ylim=c(0,250),
+main="Monthly Rainfall in major cities",
+xlab="Month of Year",
+ylab="Rainfall (mm)",
+type="l",
+lty=1,
+lwd=2)
+
+lines(rain$NewYork,lty=2,lwd=2) 
+lines(rain$London,lty=3,lwd=2)
+lines(rain$Berlin,lty=4,lwd=2)
+
+legend("top",
+legend=c("Tokyo","New York","London","Berlin"),
+ncol=4,
+cex=0.8,
+bty="n",
+lty=1:4,
+lwd=2)
+
+
+
+#Recipe 8. Choosing box styles
+
+par(bty="l")
+plot(rnorm(100))
+
+
+par(oma=c(1,1,1,1))
+plot(rnorm(100),bty="l")
+box(which="figure")
+
+
+#Recipe 9. How to adjust axis labels and tick marks styles
+
+plot(rnorm(100),xaxp=c(0,100,10))
+
+
+
+#Recipe 10. How to format log axes
+
+plot(10^c(1:5),log="y",type="b")
+
+
+#Recipe 11. Setting graph margins and dimensions 
+
+par(fin=c(6,6), 
+pin=c(4,4))
+
+par(mai=c(1,1,1,1),
+omi=c(0.1,0.1,0.1,0.1))
+
+

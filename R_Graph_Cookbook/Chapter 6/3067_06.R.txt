@@ -1,0 +1,121 @@
+#Recipe 1. Visualising distributions as frequency or probability  
+
+air<-read.csv("airpollution.csv")
+
+hist(air$Nitrogen.Oxides,
+     xlab="Nitrogen Oxide Concentrations",
+     main="Distribution of Nitrogen Oxide Concentrations")
+
+
+hist(air$Nitrogen.Oxides,
+     freq=FALSE,
+     xlab="Nitrogen Oxide Concentrations",
+     main="Distribution of Nitrogen Oxide Concentrations")
+
+
+
+#Recipe 2. Setting bin size and number of breaks
+
+air<-read.csv("airpollution.csv")
+
+hist(air$Nitrogen.Oxides,
+     breaks=20,
+     xlab="Nitrogen Oxide Concentrations",
+     main="Distribution of Nitrogen Oxide Concentrations")
+
+hist(air$Nitrogen.Oxides,
+     breaks=c(0,100,200,300,400,500,600),
+     xlab="Nitrogen Oxide Concentrations",
+     main="Distribution of Nitrogen Oxide Concentrations")
+
+#Recipe 3. Adjusting histogram styles: bar colours, borders and axes
+
+air<-read.csv("airpollution.csv")
+
+hist(air$Respirable.Particles,
+     prob=TRUE,
+     col="black",
+     border="white",
+     xlab="Respirable Particle Concentrations",
+     main="Distribution of Respirable Particle Concentrations")
+
+
+par(yaxs="i",las=1)
+hist(air$Respirable.Particles,
+     prob=TRUE,	
+     col="black",
+     border="white",
+     xlab="Respirable Particle Concentrations",
+     main="Distribution of Respirable Particle Concentrations")
+box(bty="l")
+grid(nx=NA,ny=NULL,lty=1,lwd=1,col="gray")
+
+
+
+#Recipe 4. Overlaying density line over a histogram
+
+par(yaxs="i",las=1)
+hist(air$Respirable.Particles,
+     prob=TRUE,
+     col="black",
+     border="white",
+     xlab="Respirable Particle Concentrations",
+     main="Distribution of Respirable Particle Concentrations")
+box(bty="l")
+
+lines(density(air$Respirable.Particles,na.rm=T),col="red",lwd=4)
+grid(nx=NA,ny=NULL,lty=1,lwd=1,col="gray")
+
+
+
+#Recipe 5. Multiple histograms along the diagonal of a pairs plot
+
+panel.hist <- function(x, ...)
+  {
+    par(usr = c(par("usr")[1:2], 0, 1.5) )
+    hist(x, prob=TRUE,add=TRUE,col="black",border="white")
+  }
+
+
+plot(iris[,1:4],
+     main="Relationships between characteristics of iris flowers",
+     pch=19,
+     col="blue",
+     cex=0.9,
+     diag.panel=panel.hist)
+
+
+#Recipe 6. Histograms in the margins of line and scatterplots
+
+air<-read.csv("airpollution.csv")
+
+#Set up the layout first
+layout(matrix(c(2,0,1,3),2,2,byrow=TRUE), widths=c(3,1), heights=c(1,3), TRUE)
+
+#Make Scatterplot
+par(mar=c(5.1,4.1,0.1,0))
+plot(air$Respirable.Particles~air$Nitrogen.Oxides,
+     pch=19,col="black",
+     xlim=c(0,600),ylim=c(0,80),
+     xlab="Nitrogen Oxides Concentrations",
+     ylab="Respirable Particle Concentrations")
+
+#Plot histogram of X variable in the top row
+par(mar=c(0,4.1,3,0))
+hist(air$Nitrogen.Oxides,
+     breaks=seq(0,600,100),
+     ann=FALSE,axes=FALSE,
+     col="black",border="white")
+
+#Plot histogram of Y variable to the right of the scatterplot
+yhist <- hist(air$Respirable.Particles,
+              breaks=seq(0,80,10),
+              plot=FALSE)
+
+par(mar=c(5.1,0,0.1,1))
+barplot(yhist$density,
+        horiz=TRUE,
+        space=0,axes=FALSE,
+        col="black",border="white")
+
+

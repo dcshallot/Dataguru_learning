@@ -1,0 +1,161 @@
+#Recipe 1. Grouping data points within a scatter plot
+
+
+library(lattice)
+	
+xyplot(mpg~disp,
+data=mtcars,
+groups=cyl,
+auto.key=list(corner=c(1,1)))
+
+
+install.packages(“ggplot2")
+
+library(ggplot2)
+qplot(disp,mpg,data=mtcars,col= as.factor(cyl))
+
+
+
+#Recipe 2. Highlighting grouped data points by colour, size and symbol type
+
+library(ggplot2)
+
+#By shape
+qplot(disp,mpg,data=mtcars,shape=as.factor(cyl)) 
+
+
+#By size
+qplot(disp,mpg,data=mtcars,size=as.factor(cyl))
+
+
+#Recipe 3. Labelling data points
+
+plot(mpg~disp, data=mtcars)
+text(258,22,"Hornet")
+
+
+health<-read.csv("HealthExpenditure.csv",header=TRUE)
+plot(health$Expenditure,health$Life_Expectancy,type="n")
+text(health$Expenditure,health$Life_Expectancy,health$Country)
+
+
+#Recipe 4. Correlation matrix using pairs plot
+
+
+panel.cor <- function(x, y, ...)
+{
+    par(usr = c(0, 1, 0, 1))
+    txt <- as.character(format(cor(x, y), digits=2))
+    text(0.5, 0.5, txt,  cex = 6* abs(cor(x, y)))
+}
+
+pairs(iris[1:4], upper.panel=panel.cor)
+
+
+#Recipe 5. Adding error bars
+
+plot(mpg~disp,data=mtcars)
+
+arrows(x0=mtcars$disp,
+y0=mtcars$mpg*0.95,
+x1=mtcars$disp,
+y1=mtcars$mpg*1.05,
+angle=90,
+code=3,
+length=0.04,
+lwd=0.4)
+
+#Horizontal
+arrows(x0=mtcars$disp*0.95,
+y0=mtcars$mpg,
+x1=mtcars$disp*1.05,
+y1=mtcars$mpg,
+angle=90,
+code=3,
+length=0.04,
+lwd=0.4)
+
+
+
+#Recipe 6. Using jitter to distinguish closely packed data points
+
+x <- rbinom(1000, 10, 0.25)
+y <- rbinom(1000, 10, 0.25)
+plot(x,y)
+
+plot(jitter(x), jitter(y))
+
+
+
+#Recipe 7. Adding linear model lines
+
+plot(mtcars$mpg~mtcars$disp)
+lmfit<-lm(mtcars$mpg~mtcars$disp)
+abline(lmfit)	
+
+
+
+#Recipe 8. Adding non-linear model curves
+
+x <- -(1:100)/10
+y <- 100 + 10 * exp(x / 2) + rnorm(x)/10
+nlmod <- nls(y ~  Const + A * exp(B * x), trace=TRUE)
+
+plot(x,y)
+lines(x, predict(nlmod), col="red")
+
+
+#Recipe 9. Adding non-parametric model curves with lowess
+
+plot(cars, main = "lowess(cars)")
+lines(lowess(cars), col = “blue")	
+lines(lowess(cars, f=0.3), col = “orange")
+
+
+#Recipe 10. Making  3-dimensional scatter plots
+
+install.packages("scatterplot3d") 
+library(scatterplot3d)
+
+scatterplot3d(x=mtcars$wt,
+  y=mtcars$disp,
+  z=mtcars$mpg)
+
+scatterplot3d(wt,disp,mpg, 	
+pch=16, highlight.3d=TRUE, angle=20,
+xlab="Weight",ylab="Displacement",zlab="Fuel Economy (mpg)",
+type="h", 
+main="Relationships between car specifications")
+
+
+
+#Recipe 11. Making Quantile-Quantile plots
+
+qqnorm(mtcars$mpg)
+qqline(mtcars$mpg)
+
+lmfit<-lm(mtcars$mpg~mtcars$disp)
+par(mfrow=c(2,2))
+plot(lmfit)
+
+
+#Recipe 12. Displaying data density on axes
+
+x<-rnorm(1000)
+plot(density(x),type="l") 
+rug(x)
+
+metals<-read.csv("metals.csv")
+plot(Ba~Cu,data=metals,xlim=c(0,100))
+rug(metals$Cu)
+rug(metals$Ba,side=2,col="red",ticksize=0.02)
+
+
+
+#Recipe 13. Making scatter plots with smoothed density representation
+
+n <- 10000
+x  <- matrix(rnorm(n), ncol=2)
+y  <- matrix(rnorm(n, mean=3, sd=1.5), ncol=2)
+smoothScatter(x,y)
+

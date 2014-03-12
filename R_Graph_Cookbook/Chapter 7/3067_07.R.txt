@@ -1,0 +1,233 @@
+#Recipe 1. Creating box plots with narrow boxes for small number of variables
+
+air<-read.csv("airpollution.csv")
+
+boxplot(air,las=1)
+
+boxplot(air,boxwex=0.2,las=1)
+
+par(las=1)
+
+boxplot(air,width=c(1,2))
+
+#Recipe 2. Grouping over a variable
+
+metals<-read.csv("metals.csv")
+
+boxplot(Cu~Source,data=metals,
+		main="Summary of Copper (Cu) concentrations by Site")
+
+boxplot(Cu~Source*Expt,data=metals,
+		main="Summary of Copper (Cu) concentrations by Site")
+
+
+#Recipe 3. Varying box widths by number of observations
+
+metals<-read.csv("metals.csv")
+
+boxplot(Cu ~ Source, data = metals,
+        varwidth=TRUE,
+        main="Summary of Copper concentrations by Site")
+
+
+
+#Recipe 4. Creating box plots with notches
+
+metals<-read.csv("metals.csv")
+
+boxplot(Cu ~ Source, data = metals,
+        varwidth=TRUE,
+        notch=TRUE,	
+        main="Summary of Copper concentrations by Site")
+
+
+#Recipe 5. Including or excluding outliers
+
+metals<-read.csv("metals.csv")
+
+boxplot(metals[,-1], 
+	outline=FALSE,
+	main="Summary of metal concentrations by Site \n (without outliers)")
+
+
+
+#Recipe 6. Creating horizontal box plots
+
+metals<-read.csv("metals.csv")
+
+boxplot(metals[,-1], 
+	horizontal=TRUE,
+	las=1,
+	main="Summary of metal concentrations by Site")
+
+
+#Recipe 7. Changing box styling
+
+metals<-read.csv("metals.csv")
+
+boxplot(metals[,-1],
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,
+        whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of metal concentrations by Site")
+
+grid(nx=NA,ny=NULL,col="gray",lty="dashed")
+
+
+#Recipe 8. Adjusting the extent of plot whiskers outside the box
+
+metals<-read.csv("metals.csv")
+
+boxplot(metals[,-1],
+	range=1,
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,
+        whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of metal concentrations by Site \n (range=1) ")
+
+boxplot(metals[,-1],
+	range=0,
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,
+        whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of metal concentrations by Site \n (range=0)")
+
+
+#Recipe 9. Showing number of observations 
+
+metals<-read.csv("metals.csv")
+
+b<-boxplot(metals[,-1],
+	  xaxt="n",
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,
+        whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of metal concentrations by Site")
+
+axis(side=1,at=1:length(b$names),labels=paste(b$names,"\n(n=",b$n,")",sep=""),mgp=c(3,2,0))
+
+
+install.packages("gplots")
+library(gplots)
+
+boxplot.n(metals[,-1],
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,
+        whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of metal concentrations by Site")
+
+
+#Recipe 10. Splitting a variable at arbitrary values into subsets
+
+metals<-read.csv("metals.csv")
+
+cuts<-c(0,40,80)
+Y<-split(x=metals$Cu, f=findInterval(metals$Cu, cuts))
+
+boxplot(Y,
+        xaxt="n",            
+        border = "white",
+        col = "black",
+        boxwex = 0.3,
+        medlwd=1,           
+	whiskcol="black",
+        staplecol="black",
+        outcol="red",cex=0.3,outpch=19,
+        main="Summary of Copper concentrations",
+	xlab="Concentration ranges",
+	las=1)
+
+axis(1,at=1:length(clabels),
+     labels=c("Below 0","0 to 40","40 to 80","Above 80"),      
+     lwd=0,lwd.ticks=1,col="gray")
+
+
+
+boxplot.cuts<-function(y,cuts) {
+
+Y<-split(metals$Cu, f=findInterval(y, cuts))
+
+b<-boxplot(Y,
+           xaxt="n",            
+           border = "white",
+           col = "black",
+           boxwex = 0.3,
+           medlwd=1,           
+           whiskcol="black",
+           staplecol="black",
+           outcol="red",cex=0.3,outpch=19,
+           main="Summary of Copper concentrations",
+           xlab="Concentration ranges",
+           las=1)
+
+clabels<-paste("Below",cuts[1])
+     
+for(k in 1:(length(cuts)-1))
+   {
+    clabels<-c(clabels, paste(as.character(cuts[k]), "to",as.character(cuts[k+1])))
+   }
+
+clabels<-c(clabels, 
+           paste("Above",as.character(cuts[length(cuts)])))
+
+axis(1,at=1:length(clabels),
+labels=clabels,lwd=0,lwd.ticks=1,col="gray")
+
+}
+
+
+boxplot.cuts(metals$Cu,c(0,30,60))
+
+boxplot(Cu~Source,data=metals,subset=Cu>40)
+
+
+#An alternative definition of boxplot.cuts()
+
+
+boxplot.cuts<-function(y,cuts) {
+
+ 	f=cut(y, c(min(y[!is.na(y)]),cuts,max(y[!is.na(y)])), ordered_results=TRUE);
+   Y<-split(y, f=f)
+ 
+	b<-boxplot(Y,
+   	        xaxt="n",            
+      	     border = "white",
+         	  col = "black",
+              boxwex = 0.3,
+	           medlwd=1,           
+	           whiskcol="black",
+           	  staplecol="black",
+              outcol="red",cex=0.3,outpch=19,
+              main="Summary of Copper concentrations",
+	     		  xlab="Concentration ranges",
+	     		  las=1)
+
+
+	clabels = as.character(levels(f))
+axis(1,at=1:length(clabels),
+labels=clabels,lwd=0,lwd.ticks=1,col="gray")
+
+}
+
+
+boxplot.cuts(metals$Cu,c(0,40,80))

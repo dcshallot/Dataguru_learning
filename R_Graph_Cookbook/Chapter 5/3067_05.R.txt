@@ -1,0 +1,245 @@
+#Recipe 1. Creating Bar charts with more than one factor variable
+
+install.packages("RColorBrewer")  #if not already installed
+library(RColorBrewer) 
+
+citysales<-read.csv("citysales.csv")
+
+barplot(as.matrix(citysales[,2:4]), beside=TRUE,
+        legend.text=citysales$City,
+        args.legend=list(bty="n",horiz=TRUE),
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        ylim=c(0,100),
+        ylab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+box(bty="l")
+
+
+#Recipe 2. Creating stacked bar charts
+
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+citysales<-read.csv("citysales.csv")
+
+barplot(as.matrix(citysales[,2:4]),  
+        legend.text=citysales$City,
+        args.legend=list(bty="n",horiz=TRUE),
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        ylim=c(0,200),
+        ylab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+
+citysalesperc<-read.csv("citysalesperc.csv") 
+
+par(mar=c(5,4,4,8),xpd=T)
+
+barplot(as.matrix(citysalesperc[,2:4]), 
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        ylab="Sales Revenue (1,000's of USD)", 
+        main="Percentage Sales Figures") 
+
+legend("right",legend=citysalesperc$City,bty="n",inset=c(-0.3,0),fill=brewer.pal(5,"Set1"))
+
+
+
+#Recipe 3. Adjusting the orientation of bars – horizontal and vertical
+
+barplot(as.matrix(citysales[,2:4]), beside=TRUE,horiz=TRUE,
+        legend.text=citysales$City,
+        args.legend=list(bty="n"),
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        xlim=c(0,100),
+        xlab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+par(mar=c(5,4,4,8),xpd=T)
+	
+barplot(as.matrix(citysalesperc[,2:4]), horiz=TRUE,
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        xlab="Percentage of Sales",
+        main="Perecentage Sales Figures")
+
+legend("right",legend=citysalesperc$City,bty="n",
+inset=c(-0.3,0),fill=brewer.pal(5,"Set1"))
+
+
+#Recipe 4. Adjusting bar widths, spacing, colours and borders
+
+barplot(as.matrix(citysales[,2:4]), beside=TRUE,
+     legend.text=citysales$City,
+     args.legend=list(bty="n",horiz=T),
+     col=c("#E5562A","#491A5B","#8C6CA8","#BD1B8A","#7CB6E4"),
+     border=FALSE,
+     space=c(0,5),
+     ylim=c(0,100),
+     ylab="Sales Revenue (1,000's of USD)",
+     main="Sales Figures")
+
+
+barplot(as.matrix(citysales[,2:4]), beside=T,
+        legend.text=citysales$City,
+        args.legend=list(bty="n",horiz=T),
+        ylim=c(0,100),
+        ylab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+
+#Recipe 5. Displaying values on top of or next to the bars
+
+x<-barplot(as.matrix(citysales[,2:4]), beside=TRUE,
+        legend.text=citysales$City,
+        args.legend=list(bty="n",horiz=TRUE),
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        ylim=c(0,100),
+        ylab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+y<-as.matrix(citysales[,2:4])
+
+text(x,y+2,labels=as.character(y))
+
+
+#Horizontal bars
+y<-barplot(as.matrix(citysales[,2:4]), beside=TRUE,horiz=TRUE,
+        legend.text=citysales$City,
+        args.legend=list(bty="n"),
+        col=brewer.pal(5,"Set1"),
+        border="white",
+        xlim=c(0,100),
+        xlab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+x<-as.matrix(citysales[,2:4])
+
+text(x+2,y,labels=as.character(x))
+
+
+
+#Recipe 6. Placing labels inside bars
+
+rain<-read.csv("cityrain.csv")
+	
+y<-barplot(as.matrix(rain[1,-1]),horiz=T,col="white",yaxt="n",
+main="Monthly Rainfall in Major CitiesJanuary",
+xlab="Rainfall (mm)")
+
+x<-0.5*rain[1,-1] 
+text(x,y,colnames(rain[-1]))
+
+
+
+#Recipe 7. Creating Bar charts with vertical error bars
+
+sales<-t(as.matrix(citysales[,-1]))
+colnames(sales)<-citysales[,1] 
+
+x<-barplot(sales,beside=T,legend.text=rownames(sales),
+args.legend=list(bty="n",horiz=T),
+col=brewer.pal(3,"Set2"),border="white",ylim=c(0,100),
+        ylab="Sales Revenue (1,000's of USD)",
+        main="Sales Figures")
+
+arrows(x0=x,
+y0=sales*0.95,
+x1=x,
+y1=sales*1.05,
+angle=90,
+code=3,
+length=0.04,
+lwd=0.4)
+
+
+#Creating a function
+errorbars<-function(x,y,upper,lower=upper,length=0.04,lwd=0.4,...) {
+arrows(x0=x,
+y0=y+upper,
+x1=x,
+y1=y-lower,
+angle=90,
+code=3,
+length=length,
+lwd=lwd)
+}
+
+errorbars(x,sales,0.05*sales) 
+
+
+#Recipe 8. Modifying dotplots by grouping variables
+
+install.packages("reshape")
+library(reshape)
+
+sales<-melt(citysales)
+
+sales$color[sales[,2]=="ProductA"] <- "red"
+sales$color[sales[,2]=="ProductB"] <- "blue"
+sales$color[sales[,2]=="ProductC"] <- "violet"
+
+dotchart(sales[,3],labels=sales$City,groups=sales[,2],
+col=sales$color,pch=19,
+main="Sales Figures",
+xlab="Sales Revenue (1,000's of USD)")
+
+
+#Recipe 9. Making better readable pie charts with clockwise-ordered slices
+
+browsers<-read.table("browsers.txt",header=TRUE)
+browsers<-browsers[order(browsers[,2]),]
+
+pie(browsers[,2],
+labels=browsers[,1],
+clockwise=TRUE,
+radius=1,
+col=brewer.pal(7,"Set1"),
+border="white",
+main="Percentage Share of Internet Browser usage")
+
+
+
+#Recipe 10. Labelling a pie chart with percentage values for each slice 
+
+	browsers<-read.table("browsers.txt",header=TRUE)
+	browsers<-browsers[order(browsers[,2]),]
+	
+pielabels <- sprintf("%s = %3.1f%s", browsers[,1], 100*browsers[,2]/sum(browsers[,2]), "%")
+
+pie(browsers[,2],
+labels=pielabels,
+clockwise=TRUE,
+radius=1,
+col=brewer.pal(7,"Set1"),
+border="white",
+cex=0.8,
+main="Percentage Share of Internet Browser usage")
+
+
+
+#Recipe 11. Adding a legend to a pie chart
+
+	browsers<-read.table("browsers.txt",header=TRUE)
+	browsers<-browsers[order(browsers[,2]),]
+	
+pielabels <- sprintf("%s = %3.1f%s", browsers[,1], 100*browsers[,2]/sum(browsers[,2]), "%")
+
+pie(browsers[,2],
+labels=NA,
+clockwise=TRUE,
+col=brewer.pal(7,"Set1"),
+border="white",
+radius=0.7,
+cex=0.8,
+main="Percentage Share of Internet Browser usage")
+
+legend("bottomright",legend=pielabels,bty="n",
+fill=brewer.pal(7,"Set1"))
+
+

@@ -1,0 +1,210 @@
+#Recipe 1. Plotting global data by countries on a world map
+
+install.packages("maps")
+library(maps)
+install.packages("WDI")
+library(WDI)
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+colors = brewer.pal(7,"PuRd")
+wgdp<-WDIsearch("gdp")
+w<-WDI(country="all", indicator=wgdp[4,1], start=2005, end=2005)
+
+w[63,1] <-  "USA"
+
+x<-map(plot=FALSE)
+
+
+x$measure<-array(NA,dim=length(x$names))
+
+for(i in 1:length(w$country)) {
+
+	for(j in 1:length(x$names)) {
+		if(grepl(w$country[i],x$names[j],ignore.case=T))
+		  x$measure[j]<-w[i,3]
+	}
+
+}
+
+sd -> data.frame(col=colours,values=seq(min(x$measure[!is.na(x$measure)]),
+max(x$measure[!is.na(x$measure)])*1.0001,length.out=7))
+
+#intervals color scheme
+sc<-array("#FFFFFF",dim=length(x$names))
+
+for (i in 1:length(x$measure))
+	if(!is.na(x$measure[i]))
+	sc[i]=as.character(sd$col[findInterval(x$measure[i],sd$values)])
+
+breaks<-sd$values
+
+layout(matrix(data=c(2,1), nrow=1, ncol=2), widths=c(8,1), heights=c(8,1))
+
+# Color Scale first
+par(mar = c(20,1,20,7),oma=c(0.2,0.2,0.2,0.2),mex=0.5)           
+image(x=1, y=0:length(breaks),z=t(matrix(breaks))*1.001
+      ,col=colours[1:length(breaks)-1]
+       ,axes=FALSE
+       ,breaks=breaks
+      ,xlab="",ylab=""
+      ,xaxt="n")
+
+axis(4,at=0:(length(breaks)-1),labels=round(breaks),col="white",las=1)
+abline(h=c(1:length(breaks)),col="white",lwd=2,xpd=F)
+
+
+#Map
+z<-map(col=sc,fill=TRUE,lty="blank")
+map(add=TRUE,col="gray",fill=FALSE)
+title("CO2 emissions (kg per 2000 US$ of GDP)")
+
+
+
+#Recipe 2. Creating graphs with regional maps
+
+library(maps)
+library(RColorBrewer)
+
+
+x<-map("state",plot=FALSE)
+
+for(i in 1:length(rownames(USArrests))) {
+	for(j in 1:length(x$names)) {
+	 if(grepl(rownames(USArrests)[i],x$names[j],ignore.case=T))
+		  x$measure[j]<-as.double(USArrests$Murder[i])
+	}
+}
+
+colours <- brewer.pal(7,"Reds")
+
+sd <- data.frame(col=colours,
+					values=seq(min(x$measure[!is.na(x$measure)]),
+					max(x$measure[!is.na(x$measure)])*1.0001, 
+					length.out=7))
+
+breaks<-sd$values
+
+matchcol<-function(y) {
+	as.character(sd$col[findInterval(y,sd$values)])
+}
+
+
+layout(matrix(data=c(2,1), nrow=1, ncol=2), 
+		 widths=c(8,1),heights=c(8,1))
+
+# Color Scale first
+par(mar = c(20,1,20,7),oma=c(0.2,0.2,0.2,0.2),mex=0.5)           
+image(x=1, y=0:length(breaks),z=t(matrix(breaks))*1.001
+      ,col=colours[1:length(breaks)-1]
+       ,axes=FALSE
+       ,breaks=breaks
+      ,xlab="", ylab="", xaxt="n")
+axis(4,at=0:(length(breaks)-1),labels=round(breaks),col="white",las=1)
+abline(h=c(1:length(breaks)),col="white",lwd=2,xpd=F)
+
+#Map
+map("state", boundary = FALSE, 
+		col=matchcol(x$measure), 
+		fill=TRUE,lty="blank")
+
+map("state", col="white",add = TRUE)
+
+title("Murder Rates by US State in 1973 \n (arrests per 100,000 residents)", line=2)
+
+
+map("county", "new york")
+
+map("state", region = c("california", "oregon", "nevada"))	
+
+map('italy', fill = TRUE, col = brewer.pal(7,"Set1"))
+
+
+
+install.packages("sp")
+library(sp)
+
+load(url("http://gadm.org/data/rda/FRA_adm1.RData"))
+
+gadm$rainfall<-rnorm(length(gadm$NAME_1),mean=50,sd=15)
+
+spplot(gadm,"rainfall", col.regions = rev(terrain.colors(gadm$rainfall)),
+		main="Rainfall  (simulated) in French administrative regions")
+
+
+#Recipe 3. Plotting data on Google maps
+
+install.packages("rgdal")
+library(rgdal)
+
+install.packages("RgoogleMaps")
+library(RgoogleMaps)
+
+air<-read.csv("londonair.csv")
+
+london<-GetMap(center=c(51.51,-0.116), 
+		zoom =10, destfile = "London.png", 
+		maptype = "mobile")
+
+PlotOnStaticMap(london,lat = air$lat, lon = air$lon, 
+		cex=2,pch=19,col=as.character(air$color))
+
+
+london<-GetMap(center=c(51.51,-0.116),zoom =10, 
+destfile = "London_satellite.png", maptype = "satellite")
+
+PlotOnStaticMap(london,lat = air$lat, lon = air$lon,
+		cex=2,pch=19,col=as.character(air$color))
+
+
+GetMap(center=c(40.714728,-73.99867), zoom =14, 
+		 destfile = "Manhattan.png", maptype = "hybrid");
+
+
+#Using OpenStreetMap
+GetMap.OSM(lonR= c(-74.67102, -74.63943), 
+			  latR = c(40.33804,40.3556), 
+			  scale = 7500, destfile = "PrincetonOSM.png")
+
+
+#Recipe 4. Creating and reading KML data
+
+install.packages("rgdal")
+library(rgdal)
+cities <- readOGR(system.file("vectors", 
+										package = "rgdal")[1], "cities")
+
+writeOGR(cities, "cities.kml", "cities", driver="KML")
+
+df <- readOGR("cities.kml", "cities")
+
+
+
+
+#Recipe 5. Working with ESRI shapefiles
+
+install.packages("maptools")
+library(maptools)
+
+sfdata <- readShapeSpatial(system.file("shapes/sids.shp", package="maptools")[1], 
+							  proj4string=CRS("+proj=longlat"))
+
+plot(sfdata, col="orange", border="white", axes=TRUE)
+
+#Output as shapefile
+writeSpatialShape(sfdata,"xxpoly")
+
+
+install.packages("shapefiles")
+library(shapefiles)
+
+sf<-system.file("shapes/sids.shp", package="maptools")[1]
+sf<-substr(sf,1,nchar(sf)-4)
+sfdata <- read.shapefile(sf)
+
+write.shapefile(sfdata, "newsf")
+
+
+
+
+

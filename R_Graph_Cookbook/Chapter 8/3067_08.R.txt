@@ -1,0 +1,250 @@
+#Recipe 1. Creating heat maps of single Z variable with scale
+
+sales<-read.csv("sales.csv")
+
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+rownames(sales)<-sales[,1]
+sales<-sales[,-1]
+data_matrix<-data.matrix(sales)
+	
+pal=brewer.pal(7,"YlOrRd")
+
+breaks<-seq(3000,12000,1500)
+
+#Create layout with 1 row and 2 columns (for the heatmap and scale); the heatmap column is 8 times as wide as the scale column
+
+layout(matrix(data=c(1,2), nrow=1, ncol=2), widths=c(8,1), heights=c(1,1))
+
+#Set margins for the heatmap
+par(mar = c(5,10,4,2),oma=c(0.2,0.2,0.2,0.2),mex=0.5)           
+
+
+image(x=1:nrow(data_matrix),y=1:ncol(data_matrix), 	
+      z=data_matrix,
+      axes=FALSE,
+      xlab="Month",
+      ylab="",
+      col=pal[1:(length(breaks)-1)], 
+      breaks=breaks,
+      main="Sales Heat Map")
+
+axis(1,at=1:nrow(data_matrix),labels=rownames(data_matrix), col="white",las=1)
+           
+axis(2,at=1:ncol(data_matrix),labels=colnames(data_matrix), col="white",las=1)
+
+abline(h=c(1:ncol(data_matrix))+0.5, 
+       v=c(1:nrow(data_matrix))+0.5, col="white",lwd=2,xpd=FALSE)
+
+breaks2<-breaks[-length(breaks)]
+
+# Color Scale
+par(mar = c(5,1,4,7)) 
+
+# If you get a figure margins error while running the above code, enlarge the plot device or adjust the margins so that the graph and scale fit within the device.
+
+image(x=1, y=0:length(breaks2),z=t(matrix(breaks2))*1.001,
+      col=pal[1:length(breaks)-1],
+      axes=FALSE,
+      breaks=breaks,
+      xlab="", ylab="",
+      xaxt="n")
+
+axis(4,at=0:(length(breaks2)-1), labels=breaks2, col="white", las=1)
+
+abline(h=c(1:length(breaks2)),col="white",lwd=2,xpd=F)
+
+
+#Recipe 2. Creating correlation heat maps
+
+genes<-read.csv("genes.csv")
+
+rownames(genes)<-genes[,1]
+data_matrix<-data.matrix(genes[,-1])
+
+pal=heat.colors(5)
+
+breaks<-seq(0,1,0.2)
+
+layout(matrix(data=c(1,2), nrow=1, ncol=2), widths=c(8,1), heights=c(1,1))
+
+par(mar = c(3,7,12,2),oma=c(0.2,0.2,0.2,0.2),mex=0.5)           
+
+image(x=1:nrow(data_matrix),y=1:ncol(data_matrix),
+	   z=data_matrix,
+      xlab="",
+      ylab="",
+      breaks=breaks,
+      col=pal,
+      axes=FALSE)
+
+
+text(x=1:nrow(data_matrix)+0.75, y=par("usr")[4] + 1.25, 
+     srt = 45, adj = 1, labels = rownames(data_matrix), 
+     xpd = TRUE)
+
+axis(2,at=1:ncol(data_matrix),labels=colnames(data_matrix),col="white",las=1)
+
+abline(h=c(1:ncol(data_matrix))+0.5,v=c(1:nrow(data_matrix))+0.5,col="white",lwd=2,xpd=F)
+
+title("Correlation between genes",line=8,adj=0)
+
+breaks2<-breaks[-length(breaks)]
+
+# Color Scale
+par(mar = c(25,1,25,7))
+image(x=1, y=0:length(breaks2),z=t(matrix(breaks2))*1.001
+      ,col=pal[1:length(breaks)-1]
+       ,axes=FALSE
+       ,breaks=breaks
+      ,xlab="",ylab=""
+      ,xaxt="n")
+
+axis(4,at=0:(length(breaks2)),labels=breaks,col="white",las=1)
+abline(h=c(1:length(breaks2)),col="white",lwd=2,xpd=FALSE)
+
+
+
+#Recipe 3. Summarising multivariate data in a single heat map
+
+nba <- read.csv("nba.csv")
+
+library(RColorBrewer)
+
+rownames(nba)<-nba[,1]
+
+data_matrix<-t(scale(data.matrix(nba[,-1])))
+
+pal=brewer.pal(6,"Blues")
+
+statnames<-c("Games Played", "Minutes Played", "Total Points", "Field Goals Made", "Field Goals Attempted", "Field Goal Percentage", "Free Throws Made", "Free Throws Attempted", "Free Throw Percentage", "Three Pointers Made", "Three Pointers Attempted", "Three Point Percentage", "Offensive Rebounds", "Defensive Rebounds", "Total Rebounds", "Assists", "Steals", "Blocks", "Turnovers", "Fouls")
+
+par(mar = c(3,14,19,2),oma=c(0.2,0.2,0.2,0.2),mex=0.5)
+
+#Heat map          
+image(x=1:nrow(data_matrix),y=1:ncol(data_matrix),
+      z=data_matrix,
+      xlab="",
+      ylab="",
+      col=pal,
+      axes=FALSE)
+
+#X axis labels
+text(1:nrow(data_matrix), par("usr")[4] + 1, 
+     srt = 45, adj = 0, 
+     labels = statnames,
+     xpd = TRUE, cex=0.85)
+
+#Y axis labels
+axis(side=2,at=1:ncol(data_matrix),
+     labels=colnames(data_matrix),
+     col="white",las=1, cex.axis=0.85)
+
+#White separating lines
+abline(h=c(1:ncol(data_matrix))+0.5,
+       v=c(1:nrow(data_matrix))+0.5,
+       col="white",lwd=1,xpd=F)
+
+#Graph Title
+text(par("usr")[1]+5, par("usr")[4] + 12,
+     "NBA per game performance of top 50corers", 
+     xpd=TRUE,font=2,cex=1.5)
+
+nba <- nba[order(nba$PTS),]
+
+
+#Recipe 4. Creating contour plots
+
+contour(x=10*1:nrow(volcano), y=10*1:ncol(volcano), z=volcano,
+		  xlab="Metres West",ylab="Metres North", 
+		  main="Topography of Maunga Whau Volcano")
+
+
+par(las=1)
+
+plot(0,0,xlim=c(0,10*nrow(volcano)),ylim=c(0,10*ncol(volcano)),type="n",xlab="Metres West",ylab="Metres North",main="Topography of Maunga Whau Volcano")
+
+u<-par("usr")
+
+rect(u[1],u[3],u[2],u[4],col="lightgreen")
+
+contour(x=10*1:nrow(volcano),y=10*1:ncol(volcano),
+		  volcano,col="red",add=TRUE)
+
+
+#Recipe 5. Creating filled contour plots
+
+
+filled.contour(x = 10*1:nrow(volcano), 
+		y = 10*1:ncol(volcano), 
+		z = volcano, color.palette = terrain.colors, 
+		plot.title = title(main = "The Topography of Maunga Whau",
+	        xlab = "Meters North", 
+		ylab = "Meters West"),
+		plot.axes = {axis(1, seq(100, 800, by = 100))
+            	axis(2, seq(100, 600, by = 100))},
+		key.title = title(main="Height\n(meters)"),
+		key.axes = axis(4, seq(90, 190, by = 10))) 
+
+#Increased detail and smoothness
+
+filled.contour(x = 10*1:nrow(volcano), 
+		y = 10*1:ncol(volcano), 
+		z = volcano, 
+		color.palette = terrain.colors, 
+		plot.title = title(main = "The Topography of Maunga Whau",
+		xlab = "Meters North", 
+		ylab = "Meters West"),
+		nlevels=100,
+		plot.axes = {axis(1, seq(100, 800, by = 100))
+            		    axis(2, seq(100, 600, by = 100))},
+		key.title = title(main="Height\n(meters)"),
+		key.axes = axis(4, seq(90, 190, by = 10))) 
+
+
+#Recipe 6. Creating 3-dimensional surface plots
+
+install.packages("rgl")
+library(rgl)
+
+z <- 2 * volcano
+x <- 10 * (1:nrow(z))
+y <- 10 * (1:ncol(z))
+
+zlim <- range(z)
+zlen <- zlim[2] - zlim[1] + 1
+
+colorlut <- terrain.colors(zlen) 
+col <- colorlut[ z-zlim[1]+1 ] 
+
+rgl.open()
+rgl.surface(x, y, z, color=col, back="lines")
+
+
+#Recipe 7. Visualizing time Series as calendar heat maps
+
+source("calendarHeat.R")
+
+stock.data <- read.csv("google.csv")
+
+install.packages("chron")
+library("chron")
+
+calendarHeat(dates=stock.data$Date, 
+	     values=stock.data$Adj.Close, 
+	     varname="Google Adjusted Close")
+
+
+#Using the openair package
+
+install.packages("openair")
+library(openair)
+
+calendarPlot(mydata)
+
+mydata$sales<-rnorm(length(mydata$nox),mean=1000,sd=1500)
+
+calendarPlot(mydata,pollutant="sales",main="Daily Sales in 2003")
+
+
