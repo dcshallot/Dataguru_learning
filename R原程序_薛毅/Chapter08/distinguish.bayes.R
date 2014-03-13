@@ -22,14 +22,14 @@ distinguish.bayes<-function
    if (var.equal == TRUE  || var.equal == T){
       for (i in 1:g){
          d2 <- mahalanobis(TstX, mu[i,], var(TrnX))
-         D[i,] <- d2 - 2*log(p[i])
+         D[i,] <- d2 - 2*log(p[i])  #different from distinguish.distance
       }
    }
    else{
       for (i in 1:g){
          S<-var(TrnX[TrnG==i,])
          d2 <- mahalanobis(TstX, mu[i,], S)
-         D[i,] <- d2 - 2*log(p[i])-log(det(S))
+         D[i,] <- d2 - 2*log(p[i])-log(det(S))  #different from distinguish.distance
       }
    }
    for (j in 1:nx){
