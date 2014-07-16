@@ -77,6 +77,9 @@ title("Adult literacy rate of Asia")
 
 
 ### book
+dev.off()
+require(graphics)
+biplot(princomp(USArrests))
 
 #9.1
 data <- read.table("clipboard", header=T)

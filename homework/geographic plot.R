@@ -77,20 +77,19 @@ spplot(gadm,"rainfall",
 
 
 
-#谷歌地图
+#谷歌地图  #以伦敦地图googlemap为底层，按照经纬度把数据点标注上去
 install.packages("rgdal") 
 library(rgdal)
 install.packages("RgoogleMaps")  # google maps api for r
 library(RgoogleMaps)
 
-#air<-read.csv("londonair.csv")
+air<-read.csv("londonair.csv") # char 9
 air <- londonair # "site_code" "site_name" "PM10"      "lat"       "long"      "color"    
 london<-GetMap(center=c(51.51,-0.116),
                zoom =10, destfile = "London.png",maptype  = "mobile")
 str(london)
 PlotOnStaticMap(london,lat = air$lat, lon = air$lon,
                 cex=2,pch=19,col=as.character(air$color)) 
-#以伦敦地图googlemap为底层，按照经纬度把数据点标注上去
 
 #satellite
 london<-GetMap(center=c(51.51,-0.116),zoom =13, destfile = "London_satellite.png",
